@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🤖 Chatbot con AI Vera</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .header-info {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 75%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.bot {
+            background: white;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .message .timestamp {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .message .sentiment {
+            font-size: 0.7rem;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
+        .sentiment.POSITIVE {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .sentiment.NEGATIVE {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-container input:focus {
+            border-color: #667eea;
+        }
+        
+        .input-container button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .input-container button:hover {
+            transform: scale(1.05);
+        }
+        
+        .input-container button:active {
+            transform: scale(0.95);
+        }
+        
+        .status {
+            padding: 10px 20px;
+            background: #e3f2fd;
+            font-size: 0.8rem;
+            color: #1976d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+        }
+        
+        .quick-actions button {
+            padding: 8px 15px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+        
+        .quick-actions button:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <h1>🧠 Bot AI con Modelli Veri</h1>
+            <div class="header-info">
+                <span id="model-status">⚡ GPT-2 / BERT</span>
+            </div>
+        </div>
+        
+        <div class="status">
+            <span>💬 Conversazione attiva</span>
+            <span id="message-count">0 messaggi</span>
+        </div>
+        
+        <div class="quick-actions">
+            <button onclick="sendMessage('Ciao!')">👋 Saluta</button>
+            <button onclick="sendMessage('Come stai?')">😊 Come stai</button>
+            <button onclick="sendMessage('Calcola 5+3')">🧮 Calcola</button>
+            <button onclick="sendMessage('Parlami dell\'Italia')">🇮🇹 Italia</button>
+            <button onclick="analyzeText()">📊 Analizza</button>
+            <button onclick="clearChat()">🗑️ Reset</button>
+        </div>
+        
+        <div class="messages" id="messages">
+            <div class="message bot">
+                Ciao! Sono una vera AI con modelli GPT-2 e BERT. Come posso aiutarti? 🚀
+                <div class="timestamp">Ora</div>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input 
+                type="text" 
+                id="user-input" 
+                placeholder="Scrivi qualcosa..."
+                onkeypress="if(event.key === 'Enter') sendMessage()"
+            >
+            <button id="send-btn" onclick="sendMessage()">Invia ➤</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let messageCount = 1;
+        
+        async function sendMessage(message = null) {
+            const input = document.getElementById('user-input');
+            const text = message || input.value.trim();
+            
+            if (!text) return;
+            
+            // Disabilita input durante l'invio
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = '⏳';
+            
+            // Mostra messaggio utente
+            addMessage(text, 'user');
+            input.value = '';
+            
+            try {
+                // Chiamata API al backend
+                const response = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        user_id: 'user123'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Risposta AI:', data);
+                
+                // Mostra risposta
+                let botMessage = data.response || data.fallback || 'Scusa, non ho capito';
+                addMessage(botMessage, 'bot', data.sentiment);
+                
+                // Aggiorna contatore
+                messageCount++;
+                document.getElementById('message-count').textContent = 
+                    `${data.conversation_length || messageCount} messaggi`;
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                addMessage('❌ Errore di connessione al server AI', 'bot');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Invia ➤';
+                input.focus();
+            }
+        }
+        
+        function addMessage(text, sender, sentiment = null) {
+            const messages = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString('it-IT');
+            
+            let html = text;
+            if (sender === 'bot' && sentiment) {
+                html += `<div class="sentiment ${sentiment}">${sentiment}</div>`;
+            }
+            html += `<div class="timestamp">${time}</div>`;
+            
+            messageDiv.innerHTML = html;
+            messages.appendChild(messageDiv);
+            
+            // Scroll in basso
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        async function analyzeText() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('Scrivi prima un testo da analizzare!');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                const data = await response.json();
+                
+                let result = `📊 Analisi:\n`;
+                result += `Sentiment: ${data.sentiment} (${(data.sentiment_score * 100).toFixed(1)}%)\n`;
+                result += `Categoria: ${data.category}\n`;
+                result += `Lunghezza: ${data.text_length} caratteri`;
+                
+                addMessage(result, 'bot');
+                input.value = '';
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                addMessage('❌ Errore nell\'analisi', 'bot');
+            }
+        }
+        
+        function clearChat() {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `
+                <div class="message bot">
+                    🗑️ Chat resettata! Come posso aiutarti?
+                    <div class="timestamp">${new Date().toLocaleTimeString('it-IT')}</div>
+                </div>
+            `;
+            messageCount = 1;
+            document.getElementById('message-count').textContent = '0 messaggi';
+            
+            // Reset sul backend
+            fetch(`${API_URL}/reset/user123`, {
+                method: 'POST'
+            }).catch(console.error);
+        }
+        
+        // Focus iniziale
+        document.getElementById('user-input').focus();
+        
+        // Ping al server per verificare connessione
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/models`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('model-status').textContent = 
+                        `✅ ${data.models.length} modelli attivi (${data.device})`;
+                }
+            } catch (error) {
+                document.getElementById('model-status').textContent = '❌ Offline';
+                console.warn('Server non raggiungibile');
+            }
+        }
+        
+        checkConnection();
+        setInterval(checkConnection, 30000);
+    </script>
+</body>
+</html>
