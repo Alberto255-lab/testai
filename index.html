@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🤖 Chatbot con AI Vera</title>
+    <title>🤖 Chatbot Kaggle</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        /* Stesso CSS di prima */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -17,7 +13,6 @@
             justify-content: center;
             align-items: center;
         }
-        
         .chat-container {
             width: 90%;
             max-width: 800px;
@@ -29,7 +24,6 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -38,23 +32,14 @@
             justify-content: space-between;
             align-items: center;
         }
-        
-        .header h1 {
-            font-size: 1.5rem;
-        }
-        
-        .header-info {
-            font-size: 0.8rem;
-            opacity: 0.9;
-        }
-        
+        .header h1 { font-size: 1.5rem; }
+        .header-info { font-size: 0.8rem; opacity: 0.9; }
         .messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
             background: #f8f9fa;
         }
-        
         .message {
             margin-bottom: 15px;
             padding: 12px 18px;
@@ -62,25 +47,16 @@
             max-width: 75%;
             animation: slideIn 0.3s ease;
         }
-        
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
         .message.user {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             margin-left: auto;
             border-bottom-right-radius: 5px;
         }
-        
         .message.bot {
             background: white;
             color: #333;
@@ -88,31 +64,11 @@
             border-bottom-left-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
         .message .timestamp {
             font-size: 0.7rem;
             opacity: 0.7;
             margin-top: 5px;
         }
-        
-        .message .sentiment {
-            font-size: 0.7rem;
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-top: 5px;
-        }
-        
-        .sentiment.POSITIVE {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .sentiment.NEGATIVE {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
         .input-container {
             padding: 20px;
             background: white;
@@ -120,7 +76,6 @@
             display: flex;
             gap: 10px;
         }
-        
         .input-container input {
             flex: 1;
             padding: 12px;
@@ -130,11 +85,7 @@
             font-size: 1rem;
             transition: border-color 0.3s;
         }
-        
-        .input-container input:focus {
-            border-color: #667eea;
-        }
-        
+        .input-container input:focus { border-color: #667eea; }
         .input-container button {
             padding: 12px 30px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -145,15 +96,8 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
-        .input-container button:hover {
-            transform: scale(1.05);
-        }
-        
-        .input-container button:active {
-            transform: scale(0.95);
-        }
-        
+        .input-container button:hover { transform: scale(1.05); }
+        .input-container button:active { transform: scale(0.95); }
         .status {
             padding: 10px 20px;
             background: #e3f2fd;
@@ -162,7 +106,6 @@
             display: flex;
             justify-content: space-between;
         }
-        
         .loading {
             display: inline-block;
             width: 20px;
@@ -172,63 +115,37 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .quick-actions {
-            display: flex;
-            gap: 10px;
-            padding: 10px 20px;
-            flex-wrap: wrap;
-            background: #f8f9fa;
+        .offline {
+            background: #f8d7da !important;
+            color: #721c24 !important;
         }
-        
-        .quick-actions button {
-            padding: 8px 15px;
-            border: 1px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-        }
-        
-        .quick-actions button:hover {
-            background: #667eea;
-            color: white;
+        .online {
+            background: #d4edda !important;
+            color: #155724 !important;
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="header">
-            <h1>🧠 Bot AI con Modelli Veri</h1>
+            <h1>🧠 Chatbot Kaggle</h1>
             <div class="header-info">
-                <span id="model-status">⚡ GPT-2 / BERT</span>
+                <span id="status-badge">🔄 Connessione...</span>
             </div>
         </div>
         
-        <div class="status">
-            <span>💬 Conversazione attiva</span>
+        <div class="status" id="status-bar">
+            <span>💬 Server: <span id="server-status">Sconosciuto</span></span>
             <span id="message-count">0 messaggi</span>
-        </div>
-        
-        <div class="quick-actions">
-            <button onclick="sendMessage('Ciao!')">👋 Saluta</button>
-            <button onclick="sendMessage('Come stai?')">😊 Come stai</button>
-            <button onclick="sendMessage('Calcola 5+3')">🧮 Calcola</button>
-            <button onclick="sendMessage('Parlami dell\'Italia')">🇮🇹 Italia</button>
-            <button onclick="analyzeText()">📊 Analizza</button>
-            <button onclick="clearChat()">🗑️ Reset</button>
         </div>
         
         <div class="messages" id="messages">
             <div class="message bot">
-                Ciao! Sono una vera AI con modelli GPT-2 e BERT. Come posso aiutarti? 🚀
+                🤖 Connesso al backend su Kaggle!
                 <div class="timestamp">Ora</div>
             </div>
         </div>
@@ -245,26 +162,28 @@
     </div>
     
     <script>
-        const API_URL = 'http://localhost:5000';
-        let messageCount = 1;
+        // ============ INSERISCI L'URL DI KAGGLE ============
+        const KAGGLE_URL = "https://il-tuo-nome.ngrok.io";  // ← SOSTITUISCI!
+        const API_URL = KAGGLE_URL;
         
+        let messageCount = 1;
+        let isConnected = false;
+        
+        // ============ FUNZIONI ============
         async function sendMessage(message = null) {
             const input = document.getElementById('user-input');
             const text = message || input.value.trim();
             
             if (!text) return;
             
-            // Disabilita input durante l'invio
             const sendBtn = document.getElementById('send-btn');
             sendBtn.disabled = true;
             sendBtn.textContent = '⏳';
             
-            // Mostra messaggio utente
             addMessage(text, 'user');
             input.value = '';
             
             try {
-                // Chiamata API al backend
                 const response = await fetch(`${API_URL}/chat`, {
                     method: 'POST',
                     headers: {
@@ -277,24 +196,21 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const data = await response.json();
-                console.log('Risposta AI:', data);
+                console.log('Risposta:', data);
                 
-                // Mostra risposta
-                let botMessage = data.response || data.fallback || 'Scusa, non ho capito';
-                addMessage(botMessage, 'bot', data.sentiment);
+                addMessage(data.response || 'Scusa, errore', 'bot');
                 
-                // Aggiorna contatore
                 messageCount++;
                 document.getElementById('message-count').textContent = 
-                    `${data.conversation_length || messageCount} messaggi`;
+                    `${messageCount} messaggi`;
                 
             } catch (error) {
                 console.error('Errore:', error);
-                addMessage('❌ Errore di connessione al server AI', 'bot');
+                addMessage('❌ Errore di connessione al server Kaggle', 'bot');
             } finally {
                 sendBtn.disabled = false;
                 sendBtn.textContent = 'Invia ➤';
@@ -302,97 +218,67 @@
             }
         }
         
-        function addMessage(text, sender, sentiment = null) {
+        function addMessage(text, sender) {
             const messages = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
             
             const time = new Date().toLocaleTimeString('it-IT');
+            messageDiv.innerHTML = `${text}<div class="timestamp">${time}</div>`;
             
-            let html = text;
-            if (sender === 'bot' && sentiment) {
-                html += `<div class="sentiment ${sentiment}">${sentiment}</div>`;
-            }
-            html += `<div class="timestamp">${time}</div>`;
-            
-            messageDiv.innerHTML = html;
             messages.appendChild(messageDiv);
-            
-            // Scroll in basso
             messages.scrollTop = messages.scrollHeight;
         }
         
-        async function analyzeText() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            
-            if (!text) {
-                alert('Scrivi prima un testo da analizzare!');
-                return;
-            }
+        // ============ TEST CONNESSIONE ============
+        async function testConnection() {
+            const statusBadge = document.getElementById('status-badge');
+            const serverStatus = document.getElementById('server-status');
             
             try {
-                const response = await fetch(`${API_URL}/analyze`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ text })
-                });
-                
-                const data = await response.json();
-                
-                let result = `📊 Analisi:\n`;
-                result += `Sentiment: ${data.sentiment} (${(data.sentiment_score * 100).toFixed(1)}%)\n`;
-                result += `Categoria: ${data.category}\n`;
-                result += `Lunghezza: ${data.text_length} caratteri`;
-                
-                addMessage(result, 'bot');
-                input.value = '';
-                
+                const response = await fetch(`${API_URL}/ping`);
+                if (response.ok) {
+                    isConnected = true;
+                    statusBadge.textContent = '✅ Online';
+                    statusBadge.style.color = '#155724';
+                    serverStatus.textContent = '🟢 Connesso';
+                    document.getElementById('status-bar').className = 'status online';
+                } else {
+                    throw new Error('Risposta non OK');
+                }
             } catch (error) {
-                console.error('Errore:', error);
-                addMessage('❌ Errore nell\'analisi', 'bot');
+                isConnected = false;
+                statusBadge.textContent = '❌ Offline';
+                statusBadge.style.color = '#721c24';
+                serverStatus.textContent = '🔴 Disconnesso';
+                document.getElementById('status-bar').className = 'status offline';
+                console.warn('Server non raggiungibile:', error);
             }
         }
         
-        function clearChat() {
-            const messages = document.getElementById('messages');
-            messages.innerHTML = `
-                <div class="message bot">
-                    🗑️ Chat resettata! Come posso aiutarti?
-                    <div class="timestamp">${new Date().toLocaleTimeString('it-IT')}</div>
-                </div>
-            `;
-            messageCount = 1;
-            document.getElementById('message-count').textContent = '0 messaggi';
-            
-            // Reset sul backend
-            fetch(`${API_URL}/reset/user123`, {
-                method: 'POST'
-            }).catch(console.error);
-        }
-        
-        // Focus iniziale
-        document.getElementById('user-input').focus();
-        
-        // Ping al server per verificare connessione
-        async function checkConnection() {
+        // ============ OTTIENI INFO MODELLI ============
+        async function getModels() {
             try {
                 const response = await fetch(`${API_URL}/models`);
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('model-status').textContent = 
-                        `✅ ${data.models.length} modelli attivi (${data.device})`;
+                    console.log('Modelli attivi:', data.models);
                 }
             } catch (error) {
-                document.getElementById('model-status').textContent = '❌ Offline';
-                console.warn('Server non raggiungibile');
+                console.warn('Impossibile ottenere info modelli');
             }
         }
         
-        checkConnection();
-        setInterval(checkConnection, 30000);
+        // ============ AVVIA ============
+        document.getElementById('user-input').focus();
+        
+        // Test connessione ogni 10 secondi
+        testConnection();
+        getModels();
+        setInterval(testConnection, 10000);
+        
+        console.log('🚀 Chatbot connesso a:', API_URL);
+        console.log('💡 Assicurati che il notebook Kaggle sia in esecuzione!');
     </script>
 </body>
 </html>
